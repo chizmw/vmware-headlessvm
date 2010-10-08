@@ -1,14 +1,3 @@
-APOLOGIES
-
-
-I can't find the source of the original script that this evolved from.
-
-Sorry.
-
-I'll add the appropriate credit when I can.
-
-
-
 USAGE
 
   # choose a VM to start
@@ -25,7 +14,8 @@ USAGE
 
 AUTHOR
 
-    Original script: unknown, to be credited
+    Original script:
+        http://github.com/bradleywright/homedir/blob/70072383df8149edc6a754e8d11ea7fd8d0ce8f9/bin/vm
 
     Modifications:
         Ash Berlin

@@ -1,0 +1,32 @@
+APOLOGIES
+
+
+I can't find the source of the original script that this evolved from.
+
+Sorry.
+
+I'll add the appropriate credit when I can.
+
+
+
+USAGE
+
+  # choose a VM to start
+  headlessvm
+  [pick a number]
+
+  # suspend a VM
+  headlessvm Suspend
+  [pick a number]
+
+  # start a known/named VM without the selection menu
+  headlessvm my-vm-name
+
+
+AUTHOR
+
+    Original script: unknown, to be credited
+
+    Modifications:
+        Ash Berlin
+        Chisel Wright

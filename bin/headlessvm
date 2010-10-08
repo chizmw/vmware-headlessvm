@@ -1,0 +1,98 @@
+#!/bin/bash
+# ~/bin/vm
+#
+# Shortcut to VMWare tools for starting and stopping headless VMs
+# (I got tired of opening the VMWare Fusion application every time)
+
+# TODO:
+# * Show running VMs and enable stopping
+# * Check VMWare exists and exit if it doesn't (cross-platform)
+
+function full_vmname() {
+    IFS="
+"
+    FULL_VMNAME="${VM_DIR}/${1}${VM_SUFFIX}";
+}
+
+# where the VMs are stored
+VM_DIR="${HOME}/Documents/Virtual Machines.localized";
+# where vmrun lives
+START_VM="/Library/Application Support/VMware Fusion/vmrun";
+# a list of non-windows Vms
+VMS=$(find "${VM_DIR}" -name "*.vmwarevm" | grep -iv 'Win');
+# the suffix to trim for the nice(r) select menu options
+VM_SUFFIX=.vmwarevm;
+
+# operation defaults to 'start'
+op=${1:-start}
+shift 1 
+
+
+# give help
+if [ "$op" = "help" ] || [ "$op" = '-?' ] || [ "$op" == "--help" ]; then
+    exec "${START_VM}" "--help"
+fi
+
+# path separators so I can use spaces in filenames
+OLD_IFS=${IFS}; IFS="
+"
+# the values to show in the nice(r) select menu options
+# needs to be calculated after we mess with IFS
+NICENAMES=$(basename -s ${VM_SUFFIX} -a $VMS);
+
+declare -a opts
+declare -a args
+
+function split_opts() {
+  while [ $# -gt 0 ]; do
+    case "$1" in 
+      -gu|-gp|-vp|-p|-u|-T|-P|-h)
+        opts=( "${opts[@]}" "$1" "$2" )
+        shift 2;
+      ;;
+      *)
+        args=( "$@" )
+        shift "$#"
+      ;;
+    esac;
+  done
+}
+
+[ "$op" = "start" ] && args=(nogui "${args[@]}")
+
+case "$op" in
+  list | help | -? | --help) 
+    "${START_VM}" "$op"
+  ;;
+  *)
+    split_opts "$@"
+
+    # if we have an operation that matches a vmname ...
+    full_vmname $op;
+    if [ -d $FULL_VMNAME ]; then
+        op='start';
+        args=(nogui "${args[@]}")
+        vm=$FULL_VMNAME;
+        "${START_VM}" "${opts[@]}" "$op" "${vm}" "${args[*]}"
+        exit=$?
+        exit $exit;
+    fi
+
+    # choose a VM to operate on
+    echo "Choose a non-Windows VM to $op:"
+
+    select vm in $NICENAMES ; do
+        # rebuild the full path
+        vm="${VM_DIR}/${vm}${VM_SUFFIX}";
+        # run file
+        "${START_VM}" "${opts[@]}" "$op" "${vm}" "${args[*]}"
+        exit=$?
+        # repair IFS
+        IFS=${OLD_IFS}
+        exit $exit
+    done
+  ;;
+esac
+
+IFS=${OLD_IFS}
+exit 1

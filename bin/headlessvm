@@ -17,7 +17,16 @@ function full_vmname() {
 # where the VMs are stored
 VM_DIR="${HOME}/Documents/Virtual Machines.localized";
 # where vmrun lives
-START_VM="/Library/Application Support/VMware Fusion/vmrun";
+for D in "/Library/Application Support/VMware Fusion/" "/Applications/VMware Fusion.app/Contents/Library"; do
+    if [ -f "$D/vmrun" ]; then
+        START_VM="$D/vmrun"
+    fi
+done
+if [ -z "$START_VM" ]; then
+    echo "unable to locate vmrun";
+    exit 1;
+fi
+
 # a list of non-windows Vms
 VMS=$(find "${VM_DIR}" -name "*.vmwarevm" | grep -iv 'Win');
 # the suffix to trim for the nice(r) select menu options
